@@ -1,3 +1,4 @@
-from funcs import getUserInfo
+from funcs import getUserInfo, menuLogic, writeTodo
 
 getUserInfo()
+menuLogic()
