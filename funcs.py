@@ -43,39 +43,10 @@ def menuLogic():
         menuChoice = input("1: Write Todo 2: Short 3: Med 4: Long -- ")
         if menuChoice == '1':
             writeTodo()
-        elif menuChoice == '2':
-            skip
-        elif menuChoice == '3':
-            skip
-        elif menuChoice == '4':
-            skip
+        elif menuChoice == [2, 3, 4]:
+            readTodos(menuChoice)
         else:
             print("Please input a valid response.\n 1: Write Todo 2: Short 3: Med 4: Long -- ")
-
-def writeTodo():
-    path = Path('todo.csv')
-    with open('todo.csv', 'w', newline='') as file:
-        writer = csv.writer(file)
-        # Create the header if the file didnt exist
-        if not path.exists():
-            writer.writerow(['Title', 'Description', 'Time Frame'])
-    
-    while True:
-        title = input("")    
-        desc = input("")
-        period = input("")
-        
-        print("Are you happy with the following entry?")
-        print(title, "\n", desc, "\n", period)
-
-        confirmation = input("Enter Y to confirm or N to redo").strip().lower()
-        if confirmation == 'y':
-            with open(path, 'a', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow([title, desc, period])
-
-import csv
-from pathlib import Path
 
 def writeTodo():
     path = Path('todo.csv')
@@ -93,7 +64,7 @@ def writeTodo():
         period = input("Enter the time frame: ")
         
         print("Are you happy with the following entry?")
-        print(title, "\n", desc, "\n", period)
+        print(f"---\n{title}\n{desc}\n{period}\n---\n")
 
         # Confirm the entry
         confirmation = input("Enter Y to confirm or N to redo: ").strip().lower()
@@ -107,3 +78,8 @@ def writeTodo():
             print("Redo your entry.")
         else:
             print("Please enter a valid response. Y to confirm and N to redo.")
+
+def readTodos(menuChoice):
+    choiceInt = int(menuChoice)
+    menuChoiceString = {2:"short-term", 3: "medium-term", 4: "long-term"}
+    print(f"Reading {menuChoiceString[choiceInt]} To-dos")
