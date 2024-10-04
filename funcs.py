@@ -89,7 +89,7 @@ def writeTodo(user):
 
         # Display the details and confirm
         print("Are you happy with the following entry?")
-        print(f"---\nTitle: {title}\nDescription: {desc}\nPeriod: {period}\n---\n")
+        print(f"---\nTitle: {title}\nDescription: {desc}\nPeriod: {period}\n---")
         
         if confirm() == 'y':
             # Save the todo to CSV
