@@ -114,7 +114,7 @@ def readTodos(menuChoice):
 
         for row in reader:
             # Debug: Print the row being processed
-            print(f"Processing row: {row}")
+            # print(f"Processing row: {row}")
 
             # Check if the length of the row matches the headers
             if len(row) == len(headers):
@@ -125,3 +125,11 @@ def readTodos(menuChoice):
             
         if not found:
             print(f"No {time_frame} To-dos found.")
+            print("Would you like to make one?")
+            confirmation = input("Y/N?").strip().lower()
+            if confirmation == 'y':
+                writeTodo()
+            elif confirmation == 'n':
+                menuLogic()
+            else:
+                print("Invalid input. Please enter 'Y' for Yes or 'N' for No.")
