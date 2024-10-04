@@ -108,7 +108,14 @@ def readTodos(menuChoice):
         
         print(f"Reading {time_frame} To-dos:")
         found = False
+        
+        # Debug: Print the headers to verify they are read correctly
+        print(f"Headers: {headers}")
+
         for row in reader:
+            # Debug: Print the row being processed
+            print(f"Processing row: {row}")
+
             # Check if the length of the row matches the headers
             if len(row) == len(headers):
                 # Check if the time frame matches (third column)
