@@ -1,3 +1,3 @@
-from funcs import startUp
+from funcs import getUserInfo
 
-startUp()
+getUserInfo()
