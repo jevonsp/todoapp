@@ -1,6 +1,8 @@
 import csv
 from pathlib import Path
 
+tasks = int(variables.get('tasks', 0))  # Ensure tasks is an integer
+
 # Universal confirmation function to standardize user input code
 def confirm():
     while True:  # Doesn't stop until the user enters Y/y or N/n
@@ -30,7 +32,6 @@ def getUserInfo():
             print(f"Config file '{configPath}' created with default values.")
 
     name = variables.get('name', "")
-    tasks = int(variables.get('tasks', 0))  # Ensure tasks is an integer
     
     while name == "":
         print("This is your first time using the program, enter your name")  # Prints the result
@@ -89,6 +90,7 @@ def writeTodo():
                 writer = csv.writer(file)
                 writer.writerow([title, desc, period])  # Append the todo item
             print("Todo added successfully!")
+            tasks += 1
             break
         else:
             print("Please redo your entry.")
