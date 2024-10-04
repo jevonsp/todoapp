@@ -51,17 +51,17 @@ def getUserInfo(user):
         user.tasks = 0  # Initialize tasks if file was created
     return user.name, user.tasks
 
-def welcome(name, tasks):
-    print(f"Welcome, {name}, to PyPlanner. You have {tasks} tasks stored.")
+def welcome(user):
+    print(f"Welcome, {user.name}, to PyPlanner. You have {user.tasks} tasks stored.")
 
-def menuLogic():
+def menuLogic(user):
     print("What would you like to do?")
     while True:
         menuChoice = input("1: Write Todo 2: Short 3: Med 4: Long -- ")
         if menuChoice == '1':
-            writeTodo()
+            writeTodo(user)
         elif menuChoice in ['2', '3', '4']:
-            readTodo(int(menuChoice))  # Convert to integer
+            readTodo(user, int(menuChoice))  # Convert to integer
         else:
             print("Please input a valid response.\n 1: Write Todo 2: Short 3: Med 4: Long -- ")
 
@@ -102,7 +102,7 @@ def writeTodo(user):
         else:
             print("Please redo your entry.")
 
-def readTodo(menuChoice):
+def readTodo(user, menuChoice):
     # Map the menu choices to their respective time frames
     menuChoiceString = {2: "s", 3: "m", 4: "l"}
     
@@ -137,4 +137,4 @@ def readTodo(menuChoice):
             if confirm() == 'y':
                 writeTodo(user)
             else:
-                menuLogic()
+                menuLogic(user)

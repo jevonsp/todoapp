@@ -7,5 +7,5 @@ user = User()
 
 # Get user information and welcome them
 name, tasks = getUserInfo(user)
-welcome(name, tasks)
-menuLogic()
+welcome(user)
+menuLogic(user)
