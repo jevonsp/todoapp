@@ -1,7 +1,8 @@
+# functions.py
+
 import csv
 from pathlib import Path
-
-tasks = int(variables.get('tasks', 0))  # Ensure tasks is an integer
+from classes import User
 
 # Universal confirmation function to standardize user input code
 def confirm():
@@ -14,7 +15,7 @@ def confirm():
         else:
             print("Invalid input. Please enter Y or N: ")
 
-def getUserInfo():
+def getUserInfo(user):
     configPath = Path("config.txt")
     variables = {}
     
@@ -24,25 +25,31 @@ def getUserInfo():
             for line in file:  # Read each line and process it
                 key, value = line.strip().split(" = ")
                 variables[key] = value.strip("'")  # Remove the quotes
+        
+        # If the file exists, retrieve name and tasks
+        name = variables.get('name', "")
+        tasks = int(variables.get('tasks', 0))  # Ensure tasks is an integer
+        user.name = name  # Set the user name from the config
+        user.tasks = tasks  # Set the user tasks from the config
     else:
         # Create the config file with default values if it doesn't exist
         with open(configPath, 'w') as file:
             file.write("name = ''\n")  # Write a default entry
             file.write("tasks = 0\n")  # Initialize tasks as well
             print(f"Config file '{configPath}' created with default values.")
-
-    name = variables.get('name', "")
-    
-    while name == "":
-        print("This is your first time using the program, enter your name")  # Prints the result
-        tempName = input("Please enter your name: ")
-        print(f"Is your name '{tempName}'?")
-        if confirm() == 'y':
-            with open(configPath, 'w') as file:
-                file.write(f"name = '{tempName}'\n")  # Store the name in a proper format                
-                print(f"Thank you, {tempName}! You can proceed.")
-            name = tempName  # Update the name after confirming
-    return name, tasks
+        
+        # Prompt for user information since the file doesn't exist
+        while user.name == "":
+            print("This is your first time using the program, enter your name")  # Prints the result
+            tempName = input("Please enter your name: ")
+            print(f"Is your name '{tempName}'?")
+            if confirm() == 'y':
+                with open(configPath, 'w') as file:
+                    file.write(f"name = '{tempName}'\n")  # Store the name in a proper format                
+                    print(f"Thank you, {tempName}! You can proceed.")
+                user.name = tempName  # Update the name after confirming
+        user.tasks = 0  # Initialize tasks if file was created
+    return user.name, user.tasks
 
 def welcome(name, tasks):
     print(f"Welcome, {name}, to PyPlanner. You have {tasks} tasks stored.")
@@ -58,7 +65,7 @@ def menuLogic():
         else:
             print("Please input a valid response.\n 1: Write Todo 2: Short 3: Med 4: Long -- ")
 
-def writeTodo():
+def writeTodo(user):
     csvPath = Path('todo.csv')
 
     # Check if the CSV file exists
@@ -90,7 +97,7 @@ def writeTodo():
                 writer = csv.writer(file)
                 writer.writerow([title, desc, period])  # Append the todo item
             print("Todo added successfully!")
-            tasks += 1
+            user.incrTask()  # Increment the task count
             break
         else:
             print("Please redo your entry.")
@@ -128,7 +135,6 @@ def readTodo(menuChoice):
             print(f"No {time_frame} To-dos found.")
             print("Would you like to make one?")
             if confirm() == 'y':
-                writeTodo()
+                writeTodo(user)
             else:
                 menuLogic()
-

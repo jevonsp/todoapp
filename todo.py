@@ -1,5 +1,11 @@
+# todo.py
+from classes import User
 from funcs import getUserInfo, welcome, menuLogic
 
-name, tasks = getUserInfo()
+# Create a User instance
+user = User()
+
+# Get user information and welcome them
+name, tasks = getUserInfo(user)
 welcome(name, tasks)
 menuLogic()
