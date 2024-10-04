@@ -1,4 +1,5 @@
-from funcs import getUserInfo, menuLogic, writeTodo
+from funcs import getUserInfo, welcome, menuLogic
 
-getUserInfo()
+name, tasks = getUserInfo()
+welcome(name, tasks)
 menuLogic()

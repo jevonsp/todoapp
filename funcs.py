@@ -1,11 +1,22 @@
 import csv
 from pathlib import Path
 
+# Universal confirmation function to standardize user input code
+def confirm():
+    while True:  # Doesn't stop until the user enters Y/y or N/n
+        userInput = input("Would you like to confirm? (Y/n): ").strip().lower()
+        if userInput == 'y':
+            return 'y'
+        elif userInput == 'n':
+            return 'n'
+        else:
+            print("Invalid input. Please enter Y or N: ")
+
 def getUserInfo():
     configPath = Path("config.txt")
     variables = {}
     
-    # Tries to read the config file
+    # Try to read the config file
     if configPath.exists():
         with open(configPath, 'r') as file:
             for line in file:  # Read each line and process it
@@ -20,26 +31,20 @@ def getUserInfo():
 
     name = variables.get('name', "")
     tasks = int(variables.get('tasks', 0))  # Ensure tasks is an integer
-
-    if name == "":
+    
+    while name == "":
         print("This is your first time using the program, enter your name")  # Prints the result
-        while True:
-            tempName = input("Please enter your name: ").strip()
-            
-            # Ask the user if they want to continue
-            confirmation = input(f"Is your name '{tempName}'? (Y/N): ").strip().lower()
-            
-            if confirmation == 'y':
-                with open(configPath, 'w') as file:
-                    file.write(f"name = '{tempName}'\n")  # Store the name in a proper format                
-                    print(f"Thank you, {tempName}! You can proceed.")  # Changed to tempName
-                break  # Exit the loop if the user confirms
-            elif confirmation == 'n':
-                print("Let's try again.")
-            else:
-                print("Invalid input. Please enter 'Y' for Yes or 'N' for No.")
-    else:
-        print(f"Welcome back {name}! You have {tasks} tasks.")
+        tempName = input("Please enter your name: ")
+        print(f"Is your name '{tempName}'?")
+        if confirm() == 'y':
+            with open(configPath, 'w') as file:
+                file.write(f"name = '{tempName}'\n")  # Store the name in a proper format                
+                print(f"Thank you, {tempName}! You can proceed.")
+            name = tempName  # Update the name after confirming
+    return name, tasks
+
+def welcome(name, tasks):
+    print(f"Welcome, {name}, to PyPlanner. You have {tasks} tasks stored.")
 
 def menuLogic():
     print("What would you like to do?")
@@ -48,16 +53,16 @@ def menuLogic():
         if menuChoice == '1':
             writeTodo()
         elif menuChoice in ['2', '3', '4']:
-            readTodos(menuChoice)
+            readTodo(int(menuChoice))  # Convert to integer
         else:
             print("Please input a valid response.\n 1: Write Todo 2: Short 3: Med 4: Long -- ")
 
 def writeTodo():
-    path = Path('todo.csv')
+    csvPath = Path('todo.csv')
 
     # Check if the CSV file exists
-    if not path.exists():
-        with open(path, 'w', newline='') as file:
+    if not csvPath.exists():
+        with open(csvPath, 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(['Title', 'Description', 'Time Frame'])  # Write headers if the file didn't exist
 
@@ -65,72 +70,63 @@ def writeTodo():
         # Prompt for todo details
         title = input("Enter the title: ")    
         desc = input("Enter the description: ")
-        period = input("Enter the time frame (short-term, medium-term, long-term): ")
-        
-        print("Are you happy with the following entry?")
-        print(f"---\n{title}\n{desc}\n{period}\n---\n")
 
-        # Confirm the entry
-        confirmation = input("Enter Y to confirm or N to redo: ").strip().lower()
-        if confirmation == 'y':
-            with open(path, 'a', newline='') as file:
+        # Loop to ensure correct period input
+        while True:
+            period = input("Enter the time frame (s: short-term, m: medium-term, l: long-term): ").strip().lower()
+            if period in ['s', 'm', 'l']:
+                break
+            else:
+                print("Invalid entry. Please enter S, M, or L.")
+
+        # Display the details and confirm
+        print("Are you happy with the following entry?")
+        print(f"---\nTitle: {title}\nDescription: {desc}\nPeriod: {period}\n---\n")
+        
+        if confirm() == 'y':
+            # Save the todo to CSV
+            with open(csvPath, 'a', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow([title, desc, period])  # Append the todo item
             print("Todo added successfully!")
-            tasks += 1 # Updates the task counter
-            break  # Exit the loop after confirming
-        elif confirmation == 'n':
-            print("Redo your entry.")
+            break
         else:
-            print("Please enter a valid response. Y to confirm and N to redo.")
+            print("Please redo your entry.")
 
-def readTodos(menuChoice):
+def readTodo(menuChoice):
     # Map the menu choices to their respective time frames
-    menuChoiceString = {2: "short-term", 3: "medium-term", 4: "long-term"}
+    menuChoiceString = {2: "s", 3: "m", 4: "l"}
     
     # Get the corresponding time frame string
-    time_frame = menuChoiceString.get(int(menuChoice))
+    time_frame = menuChoiceString.get(menuChoice)
     
     if time_frame is None:
         print("Invalid menu choice.")
         return
     
-    path = Path('todo.csv')
-    
-    # Check if the CSV file exists
-    if not path.exists():
+    csvPath = Path('todo.csv')
+    if not csvPath.exists():
         print("No todo entries found. The todo.csv file does not exist.")
         return
-    
+
     # Read from the CSV and filter based on the time frame
-    with open(path, 'r', newline='') as file:
+    with open(csvPath, 'r', newline='') as file:
         reader = csv.reader(file)
         headers = next(reader)  # Skip header row
         
         print(f"Reading {time_frame} To-dos:")
         found = False
-        
-        # Debug: Print the headers to verify they are read correctly
-        print(f"Headers: {headers}")
 
         for row in reader:
-            # Debug: Print the row being processed
-            print(f"Processing row: {row}")
-
-            # Check if the length of the row matches the headers
-            if len(row) == len(headers):
-                # Check if the time frame matches (third column)
-                if row[2].strip().lower() == time_frame:  # Ensure comparison is case-insensitive
-                    print(f"Title: {row[0]}, Description: {row[1]}, Time Frame: {row[2]}")
-                    found = True
+            if len(row) == len(headers) and row[2].strip().lower() == time_frame:  # Ensure comparison is case-insensitive
+                print(f"Title: {row[0]}, Description: {row[1]}, Time Frame: {row[2]}")
+                found = True
             
         if not found:
             print(f"No {time_frame} To-dos found.")
             print("Would you like to make one?")
-            confirmation = input("Y/N? ").strip().lower()
-            if confirmation == 'y':
+            if confirm() == 'y':
                 writeTodo()
-            elif confirmation == 'n':
-                menuLogic()
             else:
-                print("Invalid input. Please enter 'Y' for Yes or 'N' for No.")
+                menuLogic()
+
